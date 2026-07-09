@@ -1,18 +1,18 @@
-# HyperFlow Radar
+# Frontier Desk
 
-HyperFlow Radar is a GoldRush-powered Hyperliquid intelligence dashboard for live smart-money flow, liquidation monitoring, and batch wallet risk analysis.
+Frontier Desk is a GoldRush-powered Robinhood Chain launch intelligence dashboard with a secondary Hyperliquid live-market radar.
 
 ## What It Shows
 
-- Live global fills from GoldRush Hyperliquid WebSocket data.
-- Liquidation radar for large and clustered liquidation events.
-- Top active wallets ranked by rolling notional, fill count, coins, and PnL.
-- Wallet watchlist powered by GoldRush `batchClearinghouseState`.
-- Demo fallback data so the product story works without an API key.
+- Robinhood Chain support marked as new on GoldRush.
+- Robinhood Chain wallet balances and recent transactions using `robinhood-mainnet`.
+- GoldRush API coverage story: 33 Robinhood Chain APIs, including 22 Foundational APIs and 11 Streaming APIs.
+- Hyperliquid live global fills, liquidation radar, and batch wallet state as the real-time proof point.
+- Demo fallback data so the product story works even when a wallet has sparse activity.
 
 ## Why GoldRush
 
-GoldRush makes the hard Hyperliquid data layer product-friendly: global flow, liquidation streams, and batch wallet state can be composed into one dashboard without building fragile wallet-by-wallet infrastructure.
+GoldRush makes newly supported chains product-friendly fast. This app turns the Robinhood Chain launch into a clear dashboard, then proves GoldRush can also handle specialized real-time market data with Hyperliquid.
 
 ## Local Setup
 
@@ -29,6 +29,13 @@ GOLDRUSH_API_KEY=your_key_here
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
+
+## APIs Used
+
+- `GET https://api.covalenthq.com/v1/robinhood-mainnet/address/{wallet}/balances_v2/`
+- `GET https://api.covalenthq.com/v1/robinhood-mainnet/address/{wallet}/transactions_v3/`
+- `wss://hypercore.goldrushdata.com/ws?key=<GOLDRUSH_API_KEY>`
+- `POST https://hypercore.goldrushdata.com/info` with `type: "batchClearinghouseState"`
 
 ## Deployment
 
