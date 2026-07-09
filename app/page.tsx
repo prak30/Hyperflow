@@ -105,6 +105,7 @@ export default function Home() {
   const totalVolume = events.reduce((sum, event) => sum + event.notional, 0);
   const largestLiquidation = liquidations[0];
   const robinhoodPortfolioValue = robinhoodSnapshot?.balances.reduce((sum, balance) => sum + balance.quote, 0) ?? 0;
+  const robinhoodBalanceCount = robinhoodSnapshot?.balances.length ?? 0;
   const robinhoodPrimaryTransactions = robinhoodSnapshot?.transactions ?? [];
   const robinhoodActivityCount = robinhoodPrimaryTransactions.length;
 
@@ -187,6 +188,7 @@ export default function Home() {
             onInput={setRobinhoodInput}
             onInspect={() => inspectRobinhoodWallet(robinhoodInput)}
             portfolioValue={robinhoodPortfolioValue}
+            balanceCount={robinhoodBalanceCount}
             transactions={robinhoodPrimaryTransactions}
           />
         ) : (
@@ -227,6 +229,7 @@ function RobinhoodView({
   onInput,
   onInspect,
   portfolioValue,
+  balanceCount,
   transactions,
 }: {
   snapshot: RobinhoodChainSnapshot | null;
@@ -235,6 +238,7 @@ function RobinhoodView({
   onInput: (value: string) => void;
   onInspect: () => void;
   portfolioValue: number;
+  balanceCount: number;
   transactions: RobinhoodChainSnapshot["transactions"];
 }) {
   return (
@@ -281,7 +285,10 @@ function RobinhoodView({
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="text-sm font-bold text-zinc-500">Portfolio snapshot</p>
-              <h3 className="mt-1 text-3xl font-black">{currency(portfolioValue)}</h3>
+              <h3 className="mt-1 text-3xl font-black">{portfolioValue > 0 ? currency(portfolioValue) : `${balanceCount} assets indexed`}</h3>
+              <p className="mt-1 text-sm text-zinc-500">
+                {portfolioValue > 0 ? "USD quote available" : "USD quotes pending for this frontier-chain wallet"}
+              </p>
             </div>
             <Badge tone={snapshot?.source === "live" ? "green" : "amber"}>{snapshot?.source ?? "loading"}</Badge>
           </div>
@@ -293,7 +300,7 @@ function RobinhoodView({
                   <div className="text-sm text-zinc-500">{balance.name} · {balance.type}</div>
                 </div>
                 <div className="text-right">
-                  <div className="font-black">{currency(balance.quote)}</div>
+                  <div className="font-black">{quoteLabel(balance.quote)}</div>
                   <div className="text-sm text-zinc-500">{balance.balanceDisplay}</div>
                 </div>
               </div>
@@ -334,8 +341,8 @@ function RobinhoodView({
                 <div className="mt-3 grid grid-cols-2 gap-2 text-sm text-zinc-600">
                   <div>From {shortAddress(tx.from)}</div>
                   <div>To {shortAddress(tx.to)}</div>
-                  <div>Value {currency(tx.valueQuote)}</div>
-                  <div>Fees {currency(tx.feesPaid, 4)}</div>
+                  <div>Value {quoteLabel(tx.valueQuote)}</div>
+                  <div>Fees {quoteLabel(tx.feesPaid, 4)}</div>
                 </div>
               </div>
             ))}
@@ -679,6 +686,10 @@ function MetricMini({ label, value }: { label: string; value: string }) {
       <div className="font-black number-tabular">{value}</div>
     </div>
   );
+}
+
+function quoteLabel(value: number, maximumFractionDigits = 2) {
+  return value > 0 ? currency(value, maximumFractionDigits) : "Quote pending";
 }
 
 function aggregateWallets(events: FlowEvent[]) {
